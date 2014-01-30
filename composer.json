@@ -1,10 +1,17 @@
 {
-    "name": "portailpro/openerpbyxmlrpc",
+    "name": "leblanc-simon/openerpbyxmlrpc",
+    "description": "Library to communicate into PHP and OpenERP",
     "version": "1.0.0",
     "license": "MIT",
 
     "type": "library",
 
+    "authors": [
+        {
+            "name": "Simon Leblanc",
+            "email": "contact@leblanc-simon.eu"
+        }
+    ],
     "autoload": {
         "psr-0": {
             "OpenErpByXmlRpc": "src/"
