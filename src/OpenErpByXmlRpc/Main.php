@@ -99,6 +99,30 @@ class Main
 
 
     /**
+     * Read the data of a model for one id
+     *
+     * @param   string      $model      The model name (object to call)
+     * @param   int         $id         The id to read
+     * @param   array       $fields     The field to include in the result (nothing for all)
+     * @return  array|null              The result of the call, null if nothing
+     * @throws  Exception               If id is not a numeric
+     */
+    public function readOne($model, $id, array $fields =array())
+    {
+        if (is_numeric($id) === false) {
+            throw new Exception('id must be a numeric');
+        }
+
+        $result = $this->read($model, $id, $fields);
+        if (is_array($result) === true && isset($result[0]) === true && is_array($result[0]) === true) {
+            return $result[0];
+        }
+
+        return null;
+    }
+
+
+    /**
      * Search ids of a model
      *
      * @param   string          $model      The model name (object to call)

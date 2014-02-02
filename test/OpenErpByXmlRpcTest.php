@@ -28,6 +28,26 @@ class OpenErpByXmlRpcTest extends PHPUnit_Framework_TestCase
     }
 
 
+    public function testReadOne()
+    {
+        $xmlrpc = new \OpenErpByXmlRpc\Main();
+        $user = $xmlrpc->readOne('res.users', 1, array('login'));
+
+        $this->assertInternalType('array', $user, 'Check the type of return');
+        $this->assertArrayHasKey('login', $user, 'Check if the result contains login');
+        $this->assertSame('admin', $user['login'], 'Check if the result has the good login');
+    }
+
+
+    public function testReadOneNothing()
+    {
+        $xmlrpc = new \OpenErpByXmlRpc\Main();
+        $user = $xmlrpc->readOne('res.users', 1000000, array('login'));
+
+        $this->assertNull($user, 'Check the type of return');
+    }
+
+
     public function testSearchWithArray()
     {
         $xmlrpc = new \OpenErpByXmlRpc\Main();
