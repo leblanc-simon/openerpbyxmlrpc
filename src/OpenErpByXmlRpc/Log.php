@@ -167,6 +167,10 @@ class Log
             return static::logObject($value);
         } elseif (is_bool($value) === true) {
             return static::logBoolean($value);
+        } elseif (is_int($value) === true) {
+            return 'int('.$value.')';
+        } elseif (is_float($value) === true) {
+            return 'float('.$value.')';
         } elseif (is_string($value) === true) {
             return $value;
         } else {
@@ -183,12 +187,7 @@ class Log
      */
     static private function logObject($value)
     {
-        ob_start();
-        var_dump($value);
-        $content = ob_get_contents();
-        ob_end_clean();
-
-        return $content;
+        return var_export($value, true);
     }
 
 
