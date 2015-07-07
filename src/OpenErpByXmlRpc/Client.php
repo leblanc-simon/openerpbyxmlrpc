@@ -3,6 +3,7 @@
 namespace OpenErpByXmlRpc;
 
 use Zend\XmlRpc\Client as ZendClient;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class to call OpenERP in XML-RPC
@@ -19,6 +20,11 @@ class Client
     private $username = null;
     private $password = null;
     private $database = null;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger = null;
 
     static private $clients = array();
 
@@ -47,7 +53,6 @@ class Client
 
         $this->setPort($port);
     }
-
 
     /**
      * Log in the OpenERP
@@ -90,7 +95,6 @@ class Client
         return true;
     }
 
-
     /**
      * Get the available database
      *
@@ -100,7 +104,6 @@ class Client
     {
         return $this->internalCall('db', 'list', array());
     }
-
 
     /**
      * Call an OpenERP method
@@ -115,7 +118,6 @@ class Client
         return $this->internalCall('object', 'execute', $params);
     }
 
-
     /**
      * Prepare an OpenERP report
      *
@@ -128,7 +130,6 @@ class Client
 
         return $this->internalCall('report', 'report', $params);
     }
-
 
     /**
      * Get an OpenERP report
@@ -143,7 +144,6 @@ class Client
         return $this->internalCall('report', 'report_get', $params);
     }
 
-
     /**
      * Get the current UID
      *
@@ -157,7 +157,6 @@ class Client
 
         return null;
     }
-
 
     /**
      * Get the last error
@@ -175,7 +174,6 @@ class Client
         return $this->errors[$nb_errors - 1];
     }
 
-
     /**
      * Call the XML-RPC request
      *
@@ -187,20 +185,25 @@ class Client
      */
     private function internalCall($type, $method, $params = array())
     {
+        $formatter = new LoggerFormatter($this->getZendClient($type));
+
         try {
             $return = $this->getZendClient($type)->call($method, $params);
 
-            Log::request($this->getZendClient($type), $type);
-            Log::response($this->getZendClient($type));
+            if (null !== $this->logger) {
+                $this->logger->debug($formatter->getRequest($type));
+                $this->logger->debug($formatter->getResponse());
+            }
         } catch (ZendClient\Exception\FaultException $e) {
-            Log::request($this->getZendClient($type), $type);
-            Log::fault($e);
+            if (null !== $this->logger) {
+                $this->logger->debug($formatter->getRequest($type));
+                $this->logger->error($formatter->fault($e));
+            }
             throw $e;
         }
 
         return $return;
     }
-
 
     /**
      * Get the Zend XML-RPC Client
@@ -216,7 +219,6 @@ class Client
 
         return static::$clients[$type];
     }
-
 
     /**
      * Build the URL to call
@@ -252,7 +254,6 @@ class Client
         return $url;
     }
 
-
     /**
      * Setter of url / host
      *
@@ -264,7 +265,6 @@ class Client
         $this->base_url = $url;
         return $this;
     }
-
 
     /**
      * Setter of port
@@ -283,7 +283,6 @@ class Client
         return $this;
     }
 
-
     /**
      * Setter of username
      *
@@ -295,7 +294,6 @@ class Client
         $this->username = $username;
         return $this;
     }
-
 
     /**
      * Setter of password
@@ -309,7 +307,6 @@ class Client
         return $this;
     }
 
-
     /**
      * Setter of database
      *
@@ -322,5 +319,15 @@ class Client
         return $this;
     }
 
-
+    /**
+     * Setter of logger
+     *
+     * @param   LoggerInterface $logger
+     * @return  $this
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+        return $this;
+    }
 }

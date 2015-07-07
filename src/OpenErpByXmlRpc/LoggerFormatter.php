@@ -4,38 +4,33 @@ namespace OpenErpByXmlRpc;
 
 use Zend\XmlRpc\Client as ZendClient;
 
-/**
- * Class to manage logger
- *
- * @package OpenErpByXmlRpc
- * @license MIT
- * @author  Simon Leblanc <contact@leblanc-simon.eu>
- */
-class Log
+class LoggerFormatter
 {
-    static private $filename;
+    /**
+     * @var ZendClient
+     */
+    private $client;
+
+    public function __construct(ZendClient $client)
+    {
+        $this->client = $client;
+    }
 
     /**
-     * Log a request
+     * Format a request
      *
-     * @param ZendClient $client
-     * @param $type
+     * @param string $type
+     * @return string
      */
-    static public function request(ZendClient $client, $type)
+    public function getRequest($type)
     {
-        if (Config::get('log', false) === false) {
-            return;
-        }
-
-        $params = $client->getLastRequest()->getParams();
+        $params = $this->client->getLastRequest()->getParams();
         $login_informations = null;
 
         if ('common' === $type) {
             $object = '';
-            $method = $client->getLastRequest()->getMethod();
-            if (Config::get('log_show_pass', false) !== true) {
-                $params[2] = '*****';
-            }
+            $method = $this->client->getLastRequest()->getMethod();
+            $params[2] = '*****';
         } elseif ('object' === $type) {
             $object = $params[3];
             $method = $params[4];
@@ -46,80 +41,36 @@ class Log
             $method = 'list';
             $params = array();
         } else {
-            return;
+            return 'Nothing...';
         }
 
-        static::write(static::buildRequestString($object, $method, $login_informations, $params));
+        return static::buildRequestString($object, $method, $login_informations, $params);
     }
 
-
     /**
-     * Log a success response
+     * Format a success response
      *
-     * @param ZendClient $client
+     * @return string
      */
-    static public function response(ZendClient $client)
+    public function getResponse()
     {
-        if (Config::get('log', false) === false) {
-            return;
-        }
-
         $content = 'Response :'."\n";
-        $content .= static::logType($client->getLastResponse()->getReturnValue());
-
-        static::write($content);
+        $content .= static::logType($this->client->getLastResponse()->getReturnValue());
+        return $content;
     }
 
-
     /**
-     * Log a fault response
+     * Format a fault response
      *
      * @param ZendClient\Exception\FaultException $e
+     * @return string
      */
-    static public function fault(ZendClient\Exception\FaultException $e)
+    public function fault(ZendClient\Exception\FaultException $e)
     {
-        if (Config::get('log', false) === false) {
-            return;
-        }
-
         $content = 'Response with Fault :'."\n";
         $content .= static::logType($e->getMessage());
 
-        static::write($content);
-    }
-
-
-    /**
-     * Write the data into a file
-     *
-     * @param   string  $data   The data to write in the file
-     */
-    static private function write($data)
-    {
-        $content = "\n\n--------------------------------------\n";
-        $content .= "\n--------- ".date('Y-m-d H:i:s')." --------\n";
-        $content .= "\n--------------------------------------\n";
-        $content .= $data;
-
-        file_put_contents(static::getFilename(), $content, FILE_APPEND);
-    }
-
-
-    /**
-     * Get the filename to use for logging
-     *
-     * @return string   the filename
-     */
-    static private function getFilename()
-    {
-        if (static::$filename === null) {
-            static::$filename = Config::get('log_filename', Config::get('log_dir').DIRECTORY_SEPARATOR.'xmlrpc-'.date('Ymd').'.log');
-            if (substr(static::$filename, 0, 1) !== '/') {
-                static::$filename = Config::get('log_dir').DIRECTORY_SEPARATOR.static::$filename;
-            }
-        }
-
-        return static::$filename;
+        return $content;
     }
 
 
@@ -136,9 +87,7 @@ class Log
     {
         $content = 'Call: '.$object.':'.$method;
         if (null !== $login_information) {
-            if (Config::get('log_show_pass', false) !== true) {
-                $login_information[2] = '*****';
-            }
+            $login_information[2] = '*****';
             $content .= sprintf(' with database: %s , uid: %s , pass: %s',
                 $login_information[0],
                 $login_information[1],

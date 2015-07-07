@@ -63,6 +63,18 @@ class Main
     {
         $this->host = $host;
         $this->port = (int)$port;
+
+        if (null !== $database) {
+            $this->setDatabase($database);
+        }
+
+        if (null !== $username) {
+            $this->setUsername($username);
+        }
+
+        if (null !== $password) {
+            $this->setPassword($password);
+        }
     }
 
     /**
@@ -74,6 +86,16 @@ class Main
     public function login()
     {
         $this->init(false);
+
+        if (null === $this->database || null === $this->username || null === $this->password) {
+            throw new Exception('Check your Odoo setting');
+        }
+
+        $this->xml_rpc
+            ->setDatabase($this->database)
+            ->setUsername($this->username)
+            ->setPassword($this->password)
+        ;
 
         if (false === $this->xml_rpc->login()) {
             $this->xml_rpc = null;
@@ -274,33 +296,31 @@ class Main
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
+        if (null !== $this->xml_rpc) {
+            $this->xml_rpc->setLogger($this->logger);
+        }
         return $this;
     }
 
     /**
      * Init the XML-RPC client
-     *
-     * @throws Exception Setting not defined
      */
     private function init($login = true)
     {
         if (null !== $this->xml_rpc) {
-            // already init
+            if (true === $login && null === $this->xml_rpc->getUid()) {
+                $this->login();
+            }
             return;
         }
 
         $this->xml_rpc = new Client($this->host, $this->port);
-        $this->xml_rpc
-            ->setDatabase($this->database)
-            ->setUsername($this->username)
-            ->setPassword($this->password)
-        ;
+
+        if (null !== $this->logger) {
+            $this->xml_rpc->setLogger($this->logger);
+        }
 
         if (true === $login) {
-            if (null === $this->database || null === $this->username || null === $this->password) {
-                throw new Exception('Check your Odoo setting');
-            }
-
             $this->login();
         }
     }
