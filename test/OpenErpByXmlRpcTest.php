@@ -2,24 +2,29 @@
 
 class OpenErpByXmlRpcTest extends PHPUnit_Framework_TestCase
 {
-    static public function setUpBeforeClass()
+    /**
+     * @var \OpenErpByXmlRpc\Main
+     */
+    protected $xml_rpc;
+
+    protected function setUp()
     {
-        \OpenErpByXmlRpc\Config::add(array(
-            'openerp_host' => 'localhost',
-            'openerp_port' => 8069,
-            'openerp_login' => 'admin',
-            'openerp_pass' => 'admin',
-            'openerp_database' => 'openerp',
-            'log' => true,
-            'log_dir' => dirname(__DIR__).'/logs',
-            'log_show_pass' => false,
-        ));
+        $this->xml_rpc = new \OpenErpByXmlRpc\Main('localhost', 8069);
+    }
+
+    protected function loginIntoOdoo()
+    {
+        $this->xml_rpc
+            ->setDatabase('openerp')
+            ->setUsername('admin')
+            ->setPassword('admin')
+        ;
     }
 
     public function testRead()
     {
-        $xmlrpc = new \OpenErpByXmlRpc\Main();
-        $user = $xmlrpc->read('res.users', 1, array('login'));
+        $this->loginIntoOdoo();
+        $user = $this->xml_rpc->read('res.users', 1, array('login'));
 
         $this->assertInternalType('array', $user, 'Check the type of return');
         $this->assertCount(1, $user, 'Check if the result contains only one result');
@@ -30,8 +35,8 @@ class OpenErpByXmlRpcTest extends PHPUnit_Framework_TestCase
 
     public function testReadOne()
     {
-        $xmlrpc = new \OpenErpByXmlRpc\Main();
-        $user = $xmlrpc->readOne('res.users', 1, array('login'));
+        $this->loginIntoOdoo();
+        $user = $this->xml_rpc->readOne('res.users', 1, array('login'));
 
         $this->assertInternalType('array', $user, 'Check the type of return');
         $this->assertArrayHasKey('login', $user, 'Check if the result contains login');
@@ -41,8 +46,8 @@ class OpenErpByXmlRpcTest extends PHPUnit_Framework_TestCase
 
     public function testReadOneNothing()
     {
-        $xmlrpc = new \OpenErpByXmlRpc\Main();
-        $user = $xmlrpc->readOne('res.users', 1000000, array('login'));
+        $this->loginIntoOdoo();
+        $user = $this->xml_rpc->readOne('res.users', 1000000, array('login'));
 
         $this->assertNull($user, 'Check the type of return');
     }
@@ -50,8 +55,8 @@ class OpenErpByXmlRpcTest extends PHPUnit_Framework_TestCase
 
     public function testSearchWithArray()
     {
-        $xmlrpc = new \OpenErpByXmlRpc\Main();
-        $user = $xmlrpc->search('res.users', array(array('login', '=', 'admin')));
+        $this->loginIntoOdoo();
+        $user = $this->xml_rpc->search('res.users', array(array('login', '=', 'admin')));
 
         $this->assertInternalType('array', $user, 'Check the type of return');
         $this->assertCount(1, $user, 'Check if the result contains only one result');
@@ -61,8 +66,8 @@ class OpenErpByXmlRpcTest extends PHPUnit_Framework_TestCase
 
     public function testSearchWithCriteria()
     {
-        $xmlrpc = new \OpenErpByXmlRpc\Main();
-        $user = $xmlrpc->search('res.users', \OpenErpByXmlRpc\Criteria::create()->equal('login', 'admin'));
+        $this->loginIntoOdoo();
+        $user = $this->xml_rpc->search('res.users', \OpenErpByXmlRpc\Criteria::create()->equal('login', 'admin'));
 
         $this->assertInternalType('array', $user, 'Check the type of return');
         $this->assertCount(1, $user, 'Check if the result contains only one result');
@@ -72,8 +77,7 @@ class OpenErpByXmlRpcTest extends PHPUnit_Framework_TestCase
 
     public function testDb()
     {
-        $xmlrpc = new \OpenErpByXmlRpc\Main();
-        $dbs = $xmlrpc->getDbs();
+        $dbs = $this->xml_rpc->getDbs();
 
         $this->assertInternalType('array', $dbs, 'Check the type of return');
         $this->assertCount(1, $dbs, 'Check if the result contains only one result');
