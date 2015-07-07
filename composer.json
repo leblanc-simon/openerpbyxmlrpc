@@ -1,7 +1,6 @@
 {
     "name": "leblanc-simon/openerpbyxmlrpc",
     "description": "Library to communicate into PHP and OpenERP",
-    "version": "1.0.0",
     "license": "MIT",
 
     "type": "library",
