@@ -7,20 +7,19 @@ Usage
 -----
 
 ```php
-// Configure OpenERP host
-\OpenErpByXmlRpc\Config::add(array(
-    'openerp_host' => 'localhost',
-    'openerp_port' => 8069,
-    'openerp_login' => 'admin',
-    'openerp_pass' => 'admin',
-    'openerp_database' => 'openerp',
-    'log' => true,
-    'log_dir' => dirname(__DIR__).'/logs',
-    'log_show_pass' => false,
-));
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+use OpenErpByXmlRpc\Main;
+
+// Configure Logger (if you want log request and response)
+$logger = new Logger('xmlrpc');
+$handler = new StreamHandler(__DIR__.'/logs/xmlrpc-'.date('Ymd').'.log', Logger::DEBUG);
+$handler->setFormatter(new \Monolog\Formatter\LineFormatter(null, null, true));
+$logger->pushHandler($handler);
 
 // Init the communication
-$xmlrpc = new \OpenErpByXmlRpc\Main();
+$xmlrpc = new Main('localhost', 8069, 'database', 'username', 'password');
+$xmlrpc->setLogger($logger); // Not required
 
 // Search datas
 $user = $xmlrpc->search('res.users', array(array('login', '=', 'admin')));

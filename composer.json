@@ -19,8 +19,8 @@
     },
 
     "require": {
-        "zendframework/zend-xmlrpc": "~2.3",
-        "zendframework/zendxml": "1.*"
+        "zendframework/zend-xmlrpc": "~2.5",
+        "monolog/monolog": "^1.14"
     },
 
     "require-dev": {
