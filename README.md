@@ -3,6 +3,8 @@ OpenErpByXmlRpc
 
 Library to communicate into PHP and OpenERP
 
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/cbb0511c-4e82-4709-88e5-e080c99fba19/mini.png)](https://insight.sensiolabs.com/projects/cbb0511c-4e82-4709-88e5-e080c99fba19)
+
 Usage
 -----
 
