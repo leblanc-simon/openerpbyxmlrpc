@@ -2,6 +2,7 @@
 
 namespace OpenErpByXmlRpc;
 
+use Zend\Http;
 use Zend\XmlRpc\Client as ZendClient;
 use Psr\Log\LoggerInterface;
 
@@ -20,6 +21,8 @@ class Client
     private $username = null;
     private $password = null;
     private $database = null;
+
+    private $options = array();
 
     /**
      * @var LoggerInterface
@@ -93,6 +96,18 @@ class Client
         }
 
         return true;
+    }
+
+    /**
+     * Set options for the HTTP Client
+     *
+     * @param array $options an array with the option use to initialize HTTP client
+     * @return $this
+     */
+    public function setClientOptions(array $options)
+    {
+        $this->options = $options;
+        return $this;
     }
 
     /**
@@ -214,7 +229,7 @@ class Client
     private function getZendClient($type)
     {
         if (isset(static::$clients[$type]) === false) {
-            static::$clients[$type] = new ZendClient($this->buildUrl($type));
+            static::$clients[$type] = new ZendClient($this->buildUrl($type), new Http\Client(null, $this->options));
         }
 
         return static::$clients[$type];

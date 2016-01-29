@@ -49,6 +49,11 @@ class Main
     private $logger;
 
     /**
+     * @var array
+     */
+    private $options = array();
+
+    /**
      * Constructor
      *
      * @param   string  $host       The Odoo host (with or without scheme)
@@ -78,6 +83,18 @@ class Main
     }
 
     /**
+     * Set options for the HTTP Client
+     *
+     * @param array $options an array with the option use to initialize HTTP client
+     * @return $this
+     */
+    public function setClientOptions(array $options)
+    {
+        $this->options = $options;
+        return $this;
+    }
+
+    /**
      * Login into Odoo
      *
      * @return $this
@@ -92,6 +109,7 @@ class Main
         }
 
         $this->xml_rpc
+            ->setClientOptions($this->options)
             ->setDatabase($this->database)
             ->setUsername($this->username)
             ->setPassword($this->password)
