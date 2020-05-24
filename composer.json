@@ -18,8 +18,8 @@
     },
 
     "require": {
-        "zendframework/zend-xmlrpc": "~2.5",
-        "monolog/monolog": "^1.14"
+        "monolog/monolog": "^1.14",
+        "laminas/laminas-xmlrpc": "^2.9"
     },
 
     "require-dev": {
