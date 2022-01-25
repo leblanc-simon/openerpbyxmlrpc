@@ -269,7 +269,7 @@ class Client
     {
         $url = '';
 
-        if (null === $this->base_url || 0 === preg_match('/^https?::/', $this->base_url)) {
+        if (null === $this->base_url || 0 === preg_match('/^https?:/', $this->base_url)) {
             $url = 'http://';
         }
 
