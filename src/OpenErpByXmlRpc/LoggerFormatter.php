@@ -2,27 +2,21 @@
 
 namespace OpenErpByXmlRpc;
 
-use Zend\XmlRpc\Client as ZendClient;
+use Laminas\XmlRpc\Client as LaminasClient;
 
 class LoggerFormatter
 {
-    /**
-     * @var ZendClient
-     */
-    private $client;
+    private LaminasClient $client;
 
-    public function __construct(ZendClient $client)
+    public function __construct(LaminasClient $client)
     {
         $this->client = $client;
     }
 
     /**
-     * Format a request
-     *
-     * @param string $type
-     * @return string
+     * Format a request.
      */
-    public function getRequest($type)
+    public function getRequest(string $type): string
     {
         $params = $this->client->getLastRequest()->getParams();
         $login_informations = null;
@@ -34,12 +28,12 @@ class LoggerFormatter
         } elseif ('object' === $type) {
             $object = $params[3];
             $method = $params[4];
-            $login_informations = array($params[0], $params[1], $params[2]);
+            $login_informations = [$params[0], $params[1], $params[2]];
             unset($params[0], $params[1], $params[2], $params[3], $params[4]);
         } elseif ('db' === $type) {
             $object = 'db';
             $method = 'list';
-            $params = array();
+            $params = [];
         } else {
             return 'Nothing...';
         }
@@ -48,24 +42,20 @@ class LoggerFormatter
     }
 
     /**
-     * Format a success response
-     *
-     * @return string
+     * Format a success response.
      */
-    public function getResponse()
+    public function getResponse(): string
     {
         $content = 'Response :'."\n";
         $content .= static::logType($this->client->getLastResponse()->getReturnValue());
+
         return $content;
     }
 
     /**
-     * Format a fault response
-     *
-     * @param ZendClient\Exception\FaultException $e
-     * @return string
+     * Format a fault response.
      */
-    public function fault(ZendClient\Exception\FaultException $e)
+    public function fault(LaminasClient\Exception\FaultException $e): string
     {
         $content = 'Response with Fault :'."\n";
         $content .= static::logType($e->getMessage());
@@ -73,17 +63,15 @@ class LoggerFormatter
         return $content;
     }
 
-
     /**
-     * Build the request in string
+     * Build the request in string.
      *
-     * @param   string      $object             The object call in XML-RPC
-     * @param   string      $method             The method call in XML-RPC
-     * @param   null|array  $login_information  The login information
-     * @param   array       $params             The parameters get in the method to call
-     * @return  string
+     * @param string     $object            The object call in XML-RPC
+     * @param string     $method            The method call in XML-RPC
+     * @param array|null $login_information The login information
+     * @param array      $params            The parameters get in the method to call
      */
-    static private function buildRequestString($object, $method, $login_information, $params)
+    private static function buildRequestString(string $object, string $method, ?array $login_information, array $params): string
     {
         $content = 'Call: '.$object.':'.$method;
         if (null !== $login_information) {
@@ -103,54 +91,63 @@ class LoggerFormatter
         return $content;
     }
 
-
     /**
-     * Convert a mixed data to string
+     * Convert a mixed data to string.
      *
-     * @param   mixed   $value  the data to convert
-     * @return  string          the data in string
+     * @param mixed $value the data to convert
+     *
+     * @return string the data in string
      */
-    private static function logType($value)
+    private static function logType($value): string
     {
-        if (is_array($value) === true || is_object($value) === true) {
-            return static::logObject($value);
-        } elseif (is_bool($value) === true) {
-            return static::logBoolean($value);
-        } elseif (is_int($value) === true) {
-            return 'int('.$value.')';
-        } elseif (is_float($value) === true) {
-            return 'float('.$value.')';
-        } elseif (is_string($value) === true) {
-            return $value;
-        } else {
+        if (true === is_array($value) || true === is_object($value)) {
             return static::logObject($value);
         }
+
+        if (true === is_bool($value)) {
+            return static::logBoolean($value);
+        }
+
+        if (true === is_int($value)) {
+            return 'int('.$value.')';
+        }
+
+        if (true === is_float($value)) {
+            return 'float('.$value.')';
+        }
+
+        if (true === is_string($value)) {
+            return $value;
+        }
+
+        // @phpstan-ignore-next-line
+        return static::logObject($value);
     }
 
-
     /**
-     * Convert an object to string
+     * Convert an object to string.
      *
-     * @param   object  $value  the data to convert
-     * @return  string          the data in string
+     * @param array|object $value the data to convert
+     *
+     * @return string the data in string
      */
-    static private function logObject($value)
+    private static function logObject($value): string
     {
         return var_export($value, true);
     }
 
-
     /**
-     * Convert a boolean to string
+     * Convert a boolean to string.
      *
-     * @param   bool    $value  the data to convert
-     * @return  string          the data in string
+     * @param bool $value the data to convert
+     *
+     * @return string the data in string
      */
-    static private function logBoolean($value)
+    private static function logBoolean(bool $value): string
     {
-        if ($value === true) {
+        if (true === $value) {
             return 'bool(true)';
-        } elseif ($value === false) {
+        } elseif (false === $value) {
             return 'bool(false)';
         } else {
             return '';

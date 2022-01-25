@@ -11,7 +11,7 @@ Usage
 ```php
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
-use OpenErpByXmlRpc\Main;
+use OpenErpByXmlRpc\OpenErpByXmlRpc;
 
 // Configure Logger (if you want log request and response)
 $logger = new Logger('xmlrpc');
@@ -20,7 +20,7 @@ $handler->setFormatter(new \Monolog\Formatter\LineFormatter(null, null, true));
 $logger->pushHandler($handler);
 
 // Init the communication
-$xmlrpc = new Main('localhost', 8069, 'database', 'username', 'password');
+$xmlrpc = new OpenErpByXmlRpc('localhost', 8069, 'database', 'username', 'password');
 $xmlrpc->setLogger($logger); // Not required
 
 // Search datas

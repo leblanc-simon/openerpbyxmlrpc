@@ -1,2 +1,5 @@
-logs
-vendor
+/logs
+/vendor
+/tests/config.test.json
+/tests/html-coverage
+.*.cache
