@@ -38,7 +38,7 @@ class LoggerFormatter
             return 'Nothing...';
         }
 
-        return static::buildRequestString($object, $method, $login_informations, $params);
+        return self::buildRequestString($object, $method, $login_informations, $params);
     }
 
     /**
@@ -47,7 +47,7 @@ class LoggerFormatter
     public function getResponse(): string
     {
         $content = 'Response :'."\n";
-        $content .= static::logType($this->client->getLastResponse()->getReturnValue());
+        $content .= self::logType($this->client->getLastResponse()->getReturnValue());
 
         return $content;
     }
@@ -58,7 +58,7 @@ class LoggerFormatter
     public function fault(LaminasClient\Exception\FaultException $e): string
     {
         $content = 'Response with Fault :'."\n";
-        $content .= static::logType($e->getMessage());
+        $content .= self::logType($e->getMessage());
 
         return $content;
     }
@@ -85,7 +85,7 @@ class LoggerFormatter
         $content .= "\n";
         $count = 0;
         foreach ($params as $param) {
-            $content .= 'Arg '.(++$count).' : '.static::logType($param)."\n";
+            $content .= 'Arg '.(++$count).' : '.self::logType($param)."\n";
         }
 
         return $content;
@@ -101,11 +101,11 @@ class LoggerFormatter
     private static function logType($value): string
     {
         if (true === is_array($value) || true === is_object($value)) {
-            return static::logObject($value);
+            return self::logObject($value);
         }
 
         if (true === is_bool($value)) {
-            return static::logBoolean($value);
+            return self::logBoolean($value);
         }
 
         if (true === is_int($value)) {
@@ -121,7 +121,7 @@ class LoggerFormatter
         }
 
         // @phpstan-ignore-next-line
-        return static::logObject($value);
+        return self::logObject($value);
     }
 
     /**
@@ -147,10 +147,8 @@ class LoggerFormatter
     {
         if (true === $value) {
             return 'bool(true)';
-        } elseif (false === $value) {
-            return 'bool(false)';
-        } else {
-            return '';
         }
+
+        return 'bool(false)';
     }
 }

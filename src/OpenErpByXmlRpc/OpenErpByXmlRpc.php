@@ -152,7 +152,12 @@ class OpenErpByXmlRpc
     {
         $this->init(false);
 
-        return $this->getClient()->getListDb();
+        $result = $this->getClient()->getListDb();
+        if (false === is_array($result)) {
+            throw new Exception('result must be an array');
+        }
+
+        return $result;
     }
 
     /**
@@ -170,7 +175,12 @@ class OpenErpByXmlRpc
             $ids = [$ids];
         }
 
-        return $this->call($model, 'read', $ids, $fields);
+        $result = $this->call($model, 'read', $ids, $fields);
+        if (false === is_array($result)) {
+            throw new Exception('result must be an array');
+        }
+
+        return $result;
     }
 
     /**
@@ -213,7 +223,12 @@ class OpenErpByXmlRpc
             throw new Exception('criteria must be an array or an instance of Criteria');
         }
 
-        return $this->call($model, 'search', $criteria);
+        $result = $this->call($model, 'search', $criteria);
+        if (false === is_array($result)) {
+            throw new Exception('result must be an array');
+        }
+
+        return $result;
     }
 
     /**
@@ -226,7 +241,12 @@ class OpenErpByXmlRpc
      */
     public function create(string $model, array $values): array
     {
-        return $this->call($model, 'create', $values);
+        $result = $this->call($model, 'create', $values);
+        if (false === is_array($result)) {
+            throw new Exception('result must be an array');
+        }
+
+        return $result;
     }
 
     /**
@@ -244,7 +264,12 @@ class OpenErpByXmlRpc
             $ids = [$ids];
         }
 
-        return $this->call($model, 'write', $ids, $values);
+        $result = $this->call($model, 'write', $ids, $values);
+        if (false === is_array($result)) {
+            throw new Exception('result must be an array');
+        }
+
+        return $result;
     }
 
     /**

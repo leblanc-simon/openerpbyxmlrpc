@@ -20,7 +20,16 @@ class OpenErpByXmlRpcTest extends TestCase
             self::fail('Impossible to read '.__DIR__.'/config.test.json');
         }
 
-        self::$config = \json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        try {
+            $config = \json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+            if (true === is_array($config)) {
+                self::$config = $config;
+            } else {
+                self::fail('Impossible to read '.__DIR__.'/config.test.json');
+            }
+        } catch (JsonException $e) {
+            self::fail('Impossible to decode '.__DIR__.'/config.test.json');
+        }
     }
 
     protected function setUp(): void

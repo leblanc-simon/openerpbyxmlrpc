@@ -249,11 +249,11 @@ class Client
      */
     private function getClient(string $type): LaminasClient
     {
-        if (false === isset(static::$clients[$type])) {
-            static::$clients[$type] = new LaminasClient($this->buildUrl($type), new Http\Client(null, $this->options));
+        if (false === isset(self::$clients[$type])) {
+            self::$clients[$type] = new LaminasClient($this->buildUrl($type), new Http\Client(null, $this->options));
         }
 
-        return static::$clients[$type];
+        return self::$clients[$type];
     }
 
     /**
